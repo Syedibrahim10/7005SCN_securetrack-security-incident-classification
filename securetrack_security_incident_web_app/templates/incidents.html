@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Incident Reports · SecureTrack{% endblock %}
+{% block content %}
+<h1>Incident Reports</h1>
+<p class="sub">Review reported events, model triage results and response status.</p>
+<div class="toolbar"><span class="muted">{{ incidents|length }} report(s)</span><a class="btn" href="{{ url_for('new_incident') }}">+ New report</a></div>
+{% if incidents %}
+<table>
+<thead><tr><th>ID / Title</th><th>Reported by</th><th>Event time</th><th>Prediction</th><th>Probability</th><th>Status</th></tr></thead>
+<tbody>
+{% for item in incidents %}
+<tr>
+<td><a class="rowlink" href="{{ url_for('incident_detail', incident_id=item.id) }}">#{{ item.id }} · {{ item.title }}</a></td>
+<td>{{ item.reporter }}</td><td>{{ item.event_timestamp }}</td>
+<td>{% if item.predicted_label == 1 %}<span class="pill red">Anomalous</span>{% elif item.predicted_label == 0 %}<span class="pill green">Normal</span>{% else %}—{% endif %}</td>
+<td>{% if item.anomaly_probability is not none %}{{ "%.1f"|format(item.anomaly_probability * 100) }}%{% else %}—{% endif %}</td>
+<td>{{ item.status }}</td>
+</tr>
+{% endfor %}
+</tbody></table>
+{% else %}<div class="card muted">No reports yet. Use “New report” to submit an incident.</div>{% endif %}
+{% endblock %}

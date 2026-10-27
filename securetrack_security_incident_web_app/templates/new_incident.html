@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Report Incident · SecureTrack{% endblock %}
+{% block content %}
+<h1>Submit an Incident Report</h1>
+<p class="sub">Provide event details. The integrated classifier estimates whether the event resembles an anomalous event in its training data.</p>
+<form class="card" method="post">
+  <label for="title">Incident title *</label>
+  <input id="title" name="title" required value="{{ form.get('title','') }}" placeholder="e.g. Unusual after-hours access">
+  <div class="two">
+    <div><label for="reporter">Reported by *</label><input id="reporter" name="reporter" required value="{{ form.get('reporter','') }}"></div>
+    <div><label for="severity">Reported severity</label>
+      <select id="severity" name="severity">
+        {% for val in ['Low','Medium','High','Critical'] %}
+        <option value="{{ val }}" {% if form.get('severity','Medium') == val %}selected{% endif %}>{{ val }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <label for="event_timestamp">Event date and time *</label>
+  <input id="event_timestamp" name="event_timestamp" type="datetime-local" required value="{{ form.get('event_timestamp','') }}">
+  <label for="activity">Activity *</label>
+  <input id="activity" name="activity" required value="{{ form.get('activity','') }}" placeholder="e.g. Logon, Connect, Disconnect, consult http">
+  <label for="description">Incident description *</label>
+  <textarea id="description" name="description" required placeholder="Describe what happened, affected systems, and any actions already taken.">{{ form.get('description','') }}</textarea>
+  <p class="muted">The current model uses activity and timestamp-derived features. It does not assess the free-text description or automatically confirm an incident.</p>
+  <button class="btn" type="submit">Save report and classify</button>
+</form>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Threat Intelligence · SecureTrack{% endblock %}
+{% block content %}
+<h1>Threat Intelligence Management</h1>
+<p class="sub">Record and maintain indicators and contextual information for analyst review.</p>
+<form class="card" method="post">
+  <h3>Add an indicator</h3>
+  <label for="indicator">Indicator value *</label>
+  <input id="indicator" name="indicator" required placeholder="IP address, domain, URL, file hash, etc.">
+  <div class="two">
+    <div><label for="indicator_type">Indicator type *</label>
+      <select id="indicator_type" name="indicator_type" required>
+        <option value="">Choose type</option>
+        {% for val in ['IP address','Domain','URL','File hash','Email address','Other'] %}
+        <option value="{{ val }}">{{ val }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div><label for="threat_name">Threat / campaign name *</label><input id="threat_name" name="threat_name" required></div>
+  </div>
+  <div class="two">
+    <div><label for="source">Source / reference</label><input id="source" name="source" placeholder="Source name or reference"></div>
+    <div><label for="confidence">Analyst confidence (0–100)</label><input id="confidence" name="confidence" type="number" min="0" max="100" value="50"></div>
+  </div>
+  <label for="notes">Notes</label><textarea id="notes" name="notes"></textarea>
+  <button class="btn" type="submit">Add intelligence entry</button>
+</form>
+<div class="toolbar"><h2>Stored indicators</h2><span class="muted">{{ indicators|length }} entry/entries</span></div>
+{% if indicators %}
+<table>
+<thead><tr><th>Indicator</th><th>Type</th><th>Threat</th><th>Confidence</th><th>Source / notes</th><th>Action</th></tr></thead>
+<tbody>
+{% for item in indicators %}
+<tr>
+<td><b>{{ item.indicator }}</b></td><td>{{ item.indicator_type }}</td><td>{{ item.threat_name }}</td>
+<td>{{ item.confidence }}%</td><td>{{ item.source or '—' }}<div class="muted">{{ item.notes or '' }}</div></td>
+<td><form class="inline" method="post" action="{{ url_for('delete_threat_intel', item_id=item.id) }}" onsubmit="return confirm('Delete this indicator?')"><button class="btn danger" type="submit">Delete</button></form></td>
+</tr>
+{% endfor %}
+</tbody></table>
+{% else %}<div class="card muted">No indicators have been added yet.</div>{% endif %}
+{% endblock %}

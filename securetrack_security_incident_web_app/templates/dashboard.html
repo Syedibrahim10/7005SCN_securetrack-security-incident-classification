@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · SecureTrack{% endblock %}
+{% block content %}
+<h1>Security Operations Dashboard</h1>
+<p class="sub">Overview of incident reports and recorded threat intelligence.</p>
+{% if not model_ready %}
+<div class="flash error">The ML model is not loaded. Add the exported model and feature files beside app.py to enable AI classification.</div>
+{% else %}
+<div class="flash success">ML classifier loaded and ready to score new incident reports.</div>
+{% endif %}
+<section class="grid">
+  <div class="card"><div class="muted">Total incidents</div><div class="metric">{{ total }}</div></div>
+  <div class="card"><div class="muted">Open incidents</div><div class="metric">{{ open_count }}</div></div>
+  <div class="card"><div class="muted">Flagged anomalous</div><div class="metric">{{ flagged }}</div></div>
+  <div class="card"><div class="muted">Threat indicators</div><div class="metric">{{ intel_count }}</div></div>
+</section>
+<div class="toolbar"><h2>Recent incident reports</h2><a class="btn" href="{{ url_for('new_incident') }}">+ Report incident</a></div>
+{% if recent %}
+<table>
+<thead><tr><th>Incident</th><th>Activity</th><th>Model result</th><th>Status</th><th>Created</th></tr></thead>
+<tbody>
+{% for item in recent %}
+<tr>
+<td><a class="rowlink" href="{{ url_for('incident_detail', incident_id=item.id) }}">#{{ item.id }} · {{ item.title }}</a><div class="muted">{{ item.reporter }}</div></td>
+<td>{{ item.activity }}</td>
+<td>{% if item.predicted_label == 1 %}<span class="pill red">Anomalous</span>{% elif item.predicted_label == 0 %}<span class="pill green">Normal</span>{% else %}Not scored{% endif %}</td>
+<td>{{ item.status }}</td><td>{{ item.created_at }}</td>
+</tr>
+{% endfor %}
+</tbody></table>
+{% else %}
+<div class="card muted">No incident reports have been submitted yet.</div>
+{% endif %}
+{% endblock %}

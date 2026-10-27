@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Incident #{{ incident.id }} · SecureTrack{% endblock %}
+{% block content %}
+<h1>Incident #{{ incident.id }}: {{ incident.title }}</h1>
+<p class="sub">Submitted by {{ incident.reporter }} · Created {{ incident.created_at }}</p>
+<div class="grid">
+  <div class="card"><div class="muted">Model classification</div><div class="metric" style="font-size:22px">{% if incident.predicted_label == 1 %}<span class="pill red">Anomalous</span>{% elif incident.predicted_label == 0 %}<span class="pill green">Normal</span>{% else %}Not scored{% endif %}</div></div>
+  <div class="card"><div class="muted">Anomaly probability</div><div class="metric">{{ "%.1f"|format((incident.anomaly_probability or 0) * 100) }}%</div></div>
+  <div class="card"><div class="muted">Reported severity</div><div class="metric" style="font-size:22px">{{ incident.severity }}</div></div>
+</div>
+<div class="card">
+  <h3>Event details</h3>
+  <p><b>Event time:</b> {{ incident.event_timestamp }}</p>
+  <p><b>Activity:</b> {{ incident.activity }}</p>
+  <p><b>Description:</b><br>{{ incident.description }}</p>
+  <hr style="border:0;border-top:1px solid #e5eaf2;margin:20px 0">
+  <h3>Response status</h3>
+  <form method="post">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      {% for val in ['Open','In Progress','Resolved'] %}
+      <option value="{{ val }}" {% if incident.status == val %}selected{% endif %}>{{ val }}</option>
+      {% endfor %}
+    </select>
+    <p><button class="btn" type="submit">Update status</button></p>
+  </form>
+</div>
+<p><a class="rowlink" href="{{ url_for('incidents') }}">← Back to incident reports</a></p>
+{% endblock %}
